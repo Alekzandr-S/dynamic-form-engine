@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+
+  postgres:
+
+    image: postgres:16
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: dynamic_form_engine
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+
+    build:
+      context: .
+
+    depends_on:
+      - postgres
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      PORT: "8080"
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/dynamic_form_engine?sslmode=disable
+
+  frontend:
+
+    build:
+      context: ./frontend
+
+    depends_on:
+      - backend
+
+    ports:
+      - "5173:80"
+
+volumes:
+  postgres_data:

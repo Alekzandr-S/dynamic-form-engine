@@ -1,56 +1,81 @@
 # Dynamic Form Engine
 
-A configuration-driven dynamic form engine built with **Go**, **PostgreSQL**, **React**, and **TypeScript**.
+A configuration-driven Dynamic Form Builder Engine built with **Go**, **PostgreSQL**, **React**, and **TypeScript**.
 
-The application allows administrators to define forms through configuration instead of code. Published forms are rendered dynamically on the frontend, validated against JSON Schema on the backend, and persisted as versioned submissions.
+This application demonstrates how dynamic forms can be defined, versioned, validated, rendered, and submitted without requiring application code changes for every new form. Form layouts and validation rules are stored as JSON documents, allowing the frontend to render forms dynamically while the backend validates submissions using JSON Schema.
 
 ---
 
-## Features
+# Features
 
-### Backend
+## Backend
 
 - Dynamic form definitions
 - Versioned form templates
-- Draft / Publish workflow
-- JSON Schema validation
-- Dynamic submission storage (JSONB)
-- PostgreSQL persistence
+- Draft → Publish workflow
+- Runtime JSON Schema validation
+- PostgreSQL JSONB storage
 - RESTful API
-- Layered architecture (Handler → Service → Repository)
+- Layered architecture
+- Docker support
 
-### Frontend
+## Frontend
 
+- React + TypeScript
 - Dynamic form rendering
-- TypeScript throughout
 - Field Registry pattern
 - API-driven UI
 - Dynamic submissions
-- Component-based architecture
+- Loading, success and error states
+
+---
+
+# Technology Stack
+
+| Layer | Technology |
+|--------|------------|
+| Backend | Go |
+| Router | Chi |
+| Database | PostgreSQL |
+| Driver | pgx |
+| Validation | JSON Schema |
+| Frontend | React |
+| Language | TypeScript |
+| Build Tool | Vite |
+| HTTP Client | Axios |
+| Styling | TailwindCSS + shadcn/ui |
+| Containers | Docker + Docker Compose |
 
 ---
 
 # Architecture
 
 ```
-                    React Frontend
-                           │
-                           ▼
-                     HTTP Handlers
-                           │
-                           ▼
-                     Service Layer
-                           │
-                           ▼
-                  Repository Layer
-                           │
-                           ▼
-                      PostgreSQL
+                React Frontend
+                       │
+                       ▼
+                HTTP Handlers
+                       │
+                       ▼
+                Service Layer
+                       │
+                       ▼
+              Repository Layer
+                       │
+                       ▼
+                  PostgreSQL
 ```
+
+Each layer has a single responsibility:
+
+- **Handlers** receive HTTP requests.
+- **Services** implement business rules.
+- **Repositories** handle persistence.
+- **Domain** models represent the business entities.
 
 ---
 
-## Project Structure
+# Project Structure
 
 ```
 dynamic-form-engine/
@@ -77,201 +102,75 @@ dynamic-form-engine/
 │   │   ├── pages/
 │   │   ├── types/
 │   │   └── App.tsx
+│   │
+│   ├── Dockerfile
+│   └── nginx.conf
 │
 ├── migrations/
+│   ├── 001_create_tables.sql
+│   └── 002_seed.sql
 │
+├── Dockerfile
+├── docker-compose.yml
 └── README.md
 ```
 
 ---
 
-# Database Design
+# Data Model
 
-The system separates the logical form from its published versions.
+The engine separates logical forms, published templates, and submitted data.
 
 ```
 Form Definition
         │
+        ▼
+Template Version
         │
         ▼
-Form Template Version
-        │
-        │
-        ▼
-Form Submission
+Submission
 ```
 
-### form_definitions
+## form_definitions
 
-Stores the logical form.
+Represents the logical form.
 
-- id
-- name
-- description
-- created_at
-- updated_at
+| Column |
+|---------|
+| id |
+| name |
+| description |
+| created_at |
+| updated_at |
 
 ---
 
-### form_template_versions
+## form_template_versions
 
-Stores published versions.
+Stores versioned form configurations.
 
-- id
-- definition_id
-- version
-- status
-- ui_schema
-- validation_schema
-- created_at
-
----
-
-### form_submissions
-
-Stores submitted data.
-
-- id
-- template_version_id
-- data
-- created_at
+| Column |
+|---------|
+| id |
+| definition_id |
+| version |
+| status |
+| ui_schema |
+| validation_schema |
+| created_at |
 
 ---
 
-# Request Flow
+## form_submissions
 
-Creating a form
+Stores submitted user data.
 
-```
-Administrator
-
-↓
-
-Create Definition
-
-↓
-
-Create Draft Version
-
-↓
-
-Publish
-```
-
-Submitting a form
-
-```
-User
-
-↓
-
-GET Published Form
-
-↓
-
-React renders UI Schema
-
-↓
-
-User submits data
-
-↓
-
-Backend validates JSON Schema
-
-↓
-
-Submission stored
-```
-
----
-
-# Technologies
-
-Backend
-
-- Go
-- Chi Router
-- PostgreSQL
-- pgx
-- JSON Schema
-
-Frontend
-
-- React
-- TypeScript
-- Vite
-- Axios
-- TailwindCSS
-- shadcn/ui
-
----
-
-# Running the Project
-
-## Backend
-
-Create:
-
-```
-.env
-```
-
-```
-PORT=8080
-
-DATABASE_URL=postgres://username:password@localhost:5432/dynamic_form_engine?sslmode=disable
-```
-
-Install dependencies
-
-```bash
-go mod tidy
-```
-
-Run
-
-```bash
-go run ./cmd/api
-```
-
-Backend runs on
-
-```
-http://localhost:8080
-```
-
----
-
-## Frontend
-
-Create
-
-```
-frontend/.env
-```
-
-```
-VITE_API_URL=http://localhost:8080
-```
-
-Install
-
-```bash
-npm install
-```
-
-Run
-
-```bash
-npm run dev
-```
-
-Frontend
-
-```
-http://localhost:5173
-```
+| Column |
+|---------|
+| id |
+| template_version_id |
+| data |
+| created_at |
 
 ---
 
@@ -302,7 +201,7 @@ http://localhost:5173
 
 ---
 
-## Submissions
+## Form Submissions
 
 | Method | Endpoint |
 |---------|----------|
@@ -310,73 +209,239 @@ http://localhost:5173
 
 ---
 
-# Example Workflow
+# Running Locally
+
+## 1. Clone the Repository
+
+```bash
+git clone <repository-url>
+
+cd dynamic-form-engine
+```
+
+---
+
+## 2. Configure the Backend
+
+Create a `.env` file:
+
+```env
+PORT=8080
+
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/dynamic_form_engine?sslmode=disable
+```
+
+---
+
+## 3. Configure the Frontend
+
+Create:
+
+```
+frontend/.env
+```
+
+```env
+VITE_API_URL=http://localhost:8080
+
+VITE_DEMO_FORM_ID=11111111-1111-1111-1111-111111111111
+```
+
+---
+
+## 4. Create the Database
+
+```sql
+CREATE DATABASE dynamic_form_engine;
+```
+
+Run the migration:
+
+```bash
+psql \
+-U postgres \
+-d dynamic_form_engine \
+-f migrations/001_create_tables.sql
+```
+
+Load the demo data:
+
+```bash
+psql \
+-U postgres \
+-d dynamic_form_engine \
+-f migrations/002_seed.sql
+```
+
+---
+
+## 5. Start the Backend
+
+```bash
+go mod tidy
+
+go run ./cmd/api
+```
+
+Backend:
+
+```
+http://localhost:8080
+```
+
+---
+
+## 6. Start the Frontend
+
+```bash
+cd frontend
+
+npm install
+
+npm run dev
+```
+
+Frontend:
+
+```
+http://localhost:5173
+```
+
+---
+
+# Running with Docker
+
+Build and start all services:
+
+```bash
+docker compose up --build
+```
+
+Services:
+
+| Service | Port |
+|----------|------|
+| PostgreSQL | 5432 |
+| Backend | 8080 |
+| Frontend | 5173 |
+
+After the containers are running, execute the migration and seed scripts:
+
+```bash
+psql \
+-U postgres \
+-d dynamic_form_engine \
+-f migrations/001_create_tables.sql
+
+psql \
+-U postgres \
+-d dynamic_form_engine \
+-f migrations/002_seed.sql
+```
+
+---
+
+# Demo Workflow
 
 1. Create a form definition.
-
-2. Create Version 1 of the template.
-
-3. Publish Version 1.
-
-4. React retrieves the published UI Schema.
-
-5. User completes the form.
-
-6. Backend validates the submission.
-
-7. Submission is stored in PostgreSQL.
+2. Create a draft template.
+3. Publish the template.
+4. Open the React application.
+5. The frontend requests the published form.
+6. The form is rendered dynamically.
+7. Submit the completed form.
+8. The backend validates the payload against the stored JSON Schema.
+9. The submission is stored in PostgreSQL.
 
 ---
 
 # Design Decisions
 
-## Why JSONB?
+## JSONB Storage
 
-The engine stores form schemas and submissions as JSONB to support arbitrary form structures without requiring database schema changes whenever a new form is introduced.
-
----
-
-## Why Separate Definitions and Versions?
-
-Separating form definitions from template versions allows:
-
-- historical integrity
-- versioning
-- draft workflows
-- publishing
-- future rollback support
-
-without affecting existing submissions.
+Form templates and submissions are stored using PostgreSQL's JSONB type. This allows new forms to be introduced without modifying the database schema.
 
 ---
 
-## Why Layered Architecture?
+## Versioned Templates
 
-The project separates responsibilities into:
+Separating definitions from template versions allows:
 
-- Handlers
-- Services
-- Repositories
+- Draft editing
+- Publishing
+- Historical integrity
+- Future rollback support
 
-This keeps HTTP concerns, business logic, and persistence independent, making the application easier to maintain and test.
+while ensuring submissions always remain linked to the version that produced them.
 
 ---
 
-## Future Improvements
+## Layered Architecture
 
-Given additional time, the following features could be added:
+The application separates:
+
+- HTTP
+- Business Logic
+- Persistence
+
+This makes the project easier to test, maintain and extend.
+
+---
+
+## Dynamic Rendering
+
+The frontend renders forms dynamically using a **Field Registry** pattern. Each field type maps to a dedicated React component, allowing additional field types to be added with minimal code changes.
+
+---
+
+# Trade-offs
+
+Given the assessment timeframe, the implementation prioritizes delivering a complete, working dynamic form engine over additional features.
+
+The following were intentionally left as future enhancements:
 
 - Authentication and authorization
-- Admin UI for form management
-- Drag-and-drop form builder
+- Drag-and-drop form designer
 - Conditional field visibility
 - Multi-step forms
 - File uploads
-- Form analytics and reporting
-- Soft deletes and audit logging
-- Docker Compose deployment
 - Automated tests
+- Audit logging
+- Cloud deployment
 - CI/CD pipeline
+
+The architecture was designed to accommodate these enhancements without significant refactoring.
+
+---
+
+# AI Usage
+
+This project was developed with assistance from **ChatGPT (OpenAI)**.
+
+AI assistance was used for:
+
+- Architectural discussions
+- Reviewing implementation approaches
+- Explaining unfamiliar concepts
+- Debugging compile/runtime issues
+- Reviewing code quality
+- Drafting documentation
+
+All generated code was reviewed, adapted where necessary, compiled, tested, and understood before being included in the final submission.
+
+---
+
+# Future Improvements
+
+- Role-based authentication
+- Drag-and-drop form builder
+- Conditional rendering rules
+- Multi-page forms
+- File upload fields
+- Form analytics
+- Full test suite
+- CI/CD pipeline
+- Production cloud deployment
 
 ---
 
@@ -384,4 +449,4 @@ Given additional time, the following features could be added:
 
 **Alekzandr S**
 
-Dynamic Form Engine Assessment
+Dynamic Form Engine — Full Stack Technical Assessment
