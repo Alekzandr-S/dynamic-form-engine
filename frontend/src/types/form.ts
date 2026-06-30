@@ -1,8 +1,17 @@
+export type FieldType =
+  | "text"
+  | "number"
+  | "checkbox"
+  | "select"
+  | "textarea";
+
 export interface Field {
   id: string;
   label: string;
-  type: string;
+  type: FieldType;
   placeholder?: string;
+  required?: boolean;
+  options?: string[];
 }
 
 export interface UISchema {

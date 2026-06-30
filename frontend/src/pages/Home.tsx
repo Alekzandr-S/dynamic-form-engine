@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div>
       <h1>Dynamic Form Engine</h1>
-      <Link to={`/forms${demoId}`}>
+      <Link to={`/forms/${demoId}`}>
         Open Demo Form
       </Link>
     </div>

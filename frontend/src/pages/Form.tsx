@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { FormVersion } from "../types/form";
 import api from "../api/api";
+import DynamicForm from "../components/DynamicForm";
 
 
 export default function Form() {
@@ -22,9 +23,7 @@ export default function Form() {
 
   return (
     <div>
-      <h1>
-        {form.uiSchema.title}
-      </h1>
+      <DynamicForm definitionId={id!} schema={form.uiSchema} />
     </div>
   )
 }
