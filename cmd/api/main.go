@@ -15,6 +15,7 @@ import (
 
 func main() {
 	cfg := config.Load()
+	println(cfg.DatabaseURL)
 
 	pool, err := database.NewPostgresPool(cfg.DatabaseURL)
 	if err != nil {
