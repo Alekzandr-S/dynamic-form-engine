@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/alekzandr-s/dynamic-form-engine/internal/config"
 	"github.com/alekzandr-s/dynamic-form-engine/internal/database"
@@ -47,9 +48,8 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{
-			"http://localhost:5173",
-			"https://dashboard-six-blond-71.vercel.app/",
+		AllowOriginFunc: func(r *http.Request, origin string) bool {
+			return origin == "http://localhost:5173" || strings.HasSuffix(origin, ".vercel.app")
 		},
 		AllowedMethods: []string{
 			"GET",
