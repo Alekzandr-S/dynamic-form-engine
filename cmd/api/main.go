@@ -49,7 +49,7 @@ func main() {
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{
 			"http://localhost:5173",
-			"https://dynamic-form-engine-csbs-phxlk8fd1.vercel.app/",
+			"https://dashboard-six-blond-71.vercel.app/",
 		},
 		AllowedMethods: []string{
 			"GET",
