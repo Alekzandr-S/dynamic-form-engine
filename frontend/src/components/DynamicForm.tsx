@@ -3,6 +3,7 @@ import type { UISchema } from "../types/form";
 import api from "../api/api";
 import DynamicField from "./DynamicField";
 import { Button } from "./ui/button";
+import { Link } from "react-router-dom";
 
 interface Props {
   definitionId: string;
@@ -34,7 +35,7 @@ export default function DynamicForm({definitionId, schema}: Props) {
     } catch (err) {
       console.error(err);
 
-      alert("Submission failed.");
+      setError("Submission failed.");
     } finally {
       setLoading(false);
     }
@@ -48,7 +49,8 @@ export default function DynamicForm({definitionId, schema}: Props) {
             <div
             className="mb-4 rounded bg-green-100 border border-green-300 p-3 text-green-700"
             >
-              Submission successful.
+              Submission successful!.
+              <Link to={"/"}>Return to Forms</Link>
             </div>
           )
         }
@@ -61,13 +63,13 @@ export default function DynamicForm({definitionId, schema}: Props) {
             </div>
           )
         }
-        <form className="rounded-lg bg-white shadow p-8" onSubmit={handleSubmit}>
+        <form className="rounded-lg bg-white shadow p-8" noValidate onSubmit={handleSubmit}>
           <h2>{schema.title}</h2>
           {schema.fields.map(field => (
             <DynamicField
               key={field.id}
               field={field}
-              value={formData[field.id]}
+              value={formData[field.id] ?? ""}
               onChange={(value) => handleChange(field.id, value)}
             />
           ))}

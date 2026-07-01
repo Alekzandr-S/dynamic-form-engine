@@ -15,7 +15,6 @@ import (
 
 func main() {
 	cfg := config.Load()
-	println(cfg.DatabaseURL)
 
 	pool, err := database.NewPostgresPool(cfg.DatabaseURL)
 	if err != nil {
@@ -66,6 +65,8 @@ func main() {
 	r.Get("/forms/{id}", submissionHandler.GetPublished)
 
 	r.Post("/forms/{id}/submissions", submissionHandler.Submit)
+
+	r.Get("/definitions", definitionHandler.List)
 
 	if err := http.ListenAndServe(":8080", r); err != nil {
 		panic(err)

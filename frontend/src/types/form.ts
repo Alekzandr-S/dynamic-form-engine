@@ -28,3 +28,9 @@ export interface FormVersion {
   validationSchema: unknown;
   createdAt: string;
 }
+
+export interface FormDefinition {
+  id: string;
+  name: string;
+  description: string;
+}

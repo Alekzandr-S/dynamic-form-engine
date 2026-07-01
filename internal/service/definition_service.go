@@ -26,3 +26,7 @@ func (s *DefinitionService) Create(ctx context.Context, definition *domain.FormD
 
 	return s.repo.Create(ctx, definition)
 }
+
+func (s *DefinitionService) List(ctx context.Context) ([]domain.FormDefinition, error) {
+	return s.repo.List(ctx)
+}

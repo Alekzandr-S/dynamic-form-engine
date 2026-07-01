@@ -35,3 +35,15 @@ func (h *DefinitionHandler) Create(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 
 }
+
+func (h *DefinitionHandler) List(w http.ResponseWriter, r *http.Request) {
+	definitions, err := h.service.List(r.Context())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	json.NewEncoder(w).Encode(definitions)
+}

@@ -71,3 +71,41 @@ func (r *FormDefinitionRepository) GetByID(ctx context.Context, definitionID uui
 
 	return definition, nil
 }
+
+func (r *FormDefinitionRepository) List(ctx context.Context) ([]domain.FormDefinition, error) {
+	query := `
+	SELECT
+		id,
+		name,
+		description,
+		created_at,
+		updated_at
+	FROM form_definitions
+	ORDER BY created_at DESC
+	`
+	rows, err := r.db.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var definitions []domain.FormDefinition
+
+	for rows.Next() {
+		var defintion domain.FormDefinition
+		err := rows.Scan(
+			&defintion.ID,
+			&defintion.Name,
+			&defintion.Description,
+			&defintion.CreatedAt,
+			&defintion.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		definitions = append(definitions, defintion)
+	}
+
+	return definitions, rows.Err()
+}
