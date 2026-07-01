@@ -1,7 +1,9 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/alekzandr-s/dynamic-form-engine/internal/config"
 	"github.com/alekzandr-s/dynamic-form-engine/internal/database"
@@ -68,7 +70,16 @@ func main() {
 
 	r.Get("/definitions", definitionHandler.List)
 
-	if err := http.ListenAndServe(":8080", r); err != nil {
+	r.Get("/health", handler.Health)
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	log.Printf("Server running on :%s", port)
+
+	if err := http.ListenAndServe(":"+port, r); err != nil {
 		panic(err)
 	}
 }

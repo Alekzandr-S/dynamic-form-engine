@@ -10,7 +10,9 @@ export default function Home() {
 
   useEffect(() => {
     api.get("definitions")
-      .then(res => setDefinitions(res.data))
+      .then(res => {
+        setDefinitions(res.data)
+      })
       .finally(() => setLoading(false));
   }, [])
 
