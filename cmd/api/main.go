@@ -47,7 +47,10 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{"http://localhost:5173"},
+		AllowedOrigins: []string{
+			"http://localhost:5173",
+			"https://dynamic-form-engine-csbs-phxlk8fd1.vercel.app/",
+		},
 		AllowedMethods: []string{
 			"GET",
 			"POST",
